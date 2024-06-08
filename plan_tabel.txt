@@ -1,0 +1,29 @@
+
+---------------------------
+1.ID
+2.Pytanie
+3.Odpowiedz
+4.Pytanie A						    #Dane Pytań#
+5.Pytanie B
+6.Pytanie C
+7.Pytanie D
+---------------------------
+
+
+
+---------------------------
+1.ID
+2.ID_Zdającego						#Wyniki#
+3.Wynik
+---------------------------
+
+
+
+
+---------------------------
+1.ID
+2.Login
+3.Hasło (szyfrowane)				#Logowanie#
+4.Imie
+5.Nazwisko
+---------------------------
