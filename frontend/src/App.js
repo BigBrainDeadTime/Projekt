@@ -6,12 +6,18 @@ import Singup from './components/SingUpForm';
 import Main from './components/Main';
 
 const App = () => {
+  // Stan zalogowanego użytkownika
   const [loggedInUser, setLoggedInUser] = useState(null);
+  // Stan przechowujący pytania w quizie
   const [Pytanie, setQuestion] = useState([]);
+  // Stan przechowujący informacje o poprawności odpowiedzi
   const [isCorrect, setIsCorrect] = useState({});
+  // Stan przechowujący informacje o tym, czy pytanie zostało już przesłane
   const [isSubmitted, setIsSubmitted] = useState({});
+  // Stan przechowujący liczbę poprawnych odpowiedzi
   const [correctAnswers, setCorrectAnswers] = useState(0);
 
+  // Pobranie danych z serwera przy pierwszym renderowaniu komponentu
   useEffect(() => {
     fetch("http://localhost:8081/getquiz", {
       method: "GET",
@@ -25,21 +31,25 @@ const App = () => {
       .catch((error) => console.log(error));
   }, []);
 
+  // Obsługa procesu logowania użytkownika
   const handleLogin = (userData) => {
     setLoggedInUser(userData);
     console.log(userData);
   };
 
+  // Obsługa procesu wylogowania użytkownika
   const handleLogout = () => {
     setLoggedInUser(null);
   };
 
+  // Aktualizacja wybranej odpowiedzi dla danego pytania w quizie
   const changeSelection = (index, value) => {
     const updatedQuestions = [...Pytanie];
     updatedQuestions[index].selectedAnswer = value;
     setQuestion(updatedQuestions);
   };
 
+  // Obsługa procesu przesyłania odpowiedzi na pytanie w quizie
   const handleSubmit = (e, index, correctAnswer) => {
     e.preventDefault();
     const selectedAnswer = Pytanie[index].selectedAnswer;
@@ -58,6 +68,7 @@ const App = () => {
     console.log(selectedAnswer);
   };
 
+  // Zakończenie quizu i wyświetlenie wyniku
   const handleFinish = () => {
     alert(`Zdobyłeś ${correctAnswers} punktów.`);
     setCorrectAnswers(0);
