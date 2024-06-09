@@ -30,3 +30,74 @@ input{
 .error{
   color:red;
 }
+.user-results {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  width: 200px;
+  background-color: #f8f8f8;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.user-results h3 {
+  margin-top: 0;
+}
+
+.user-results ul {
+  list-style-type: none;
+  padding-right: 0;
+}
+
+.user-results li {
+  margin-bottom: 5px;
+}
+
+.main {
+  padding: 20px;
+}
+
+.quiz-form {
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+
+
+.scrollable-container {
+  max-height: 600px;
+  max-width: 800px;
+  overflow-x: hidden;
+  overflow-y:scroll; 
+}
+.user-results table {
+  width: 100%;
+}
+
+.user-results th,
+.user-results td {
+  padding: 10px;
+  text-align: center;
+}
+
+.user-results th {
+  background-color: #f2f2f2;
+}
+
+.user-results .scrollable-container2 {
+  max-height: 300px;
+  max-width: 300px;
+  overflow-x: hidden; 
+  overflow-y:scroll;
+}
+.radio {
+  margin-right: 10px;
+  margin-top: 30px;
+
+}

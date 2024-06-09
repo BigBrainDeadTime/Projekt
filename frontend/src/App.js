@@ -4,20 +4,16 @@ import LoginForm from './components/LoginForm';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Singup from './components/SingUpForm';
 import Main from './components/Main';
+import UserResults from './components/UserResult';
 
 const App = () => {
-  // Stan zalogowanego użytkownika
   const [loggedInUser, setLoggedInUser] = useState(null);
-  // Stan przechowujący pytania w quizie
   const [Pytanie, setQuestion] = useState([]);
-  // Stan przechowujący informacje o poprawności odpowiedzi
   const [isCorrect, setIsCorrect] = useState({});
-  // Stan przechowujący informacje o tym, czy pytanie zostało już przesłane
   const [isSubmitted, setIsSubmitted] = useState({});
-  // Stan przechowujący liczbę poprawnych odpowiedzi
   const [correctAnswers, setCorrectAnswers] = useState(0);
+  const [refreshTrigger, setRefreshTrigger] = useState(false);
 
-  // Pobranie danych z serwera przy pierwszym renderowaniu komponentu
   useEffect(() => {
     fetch("http://localhost:8081/getquiz", {
       method: "GET",
@@ -29,7 +25,7 @@ const App = () => {
         console.log(updatedData);
       })
       .catch((error) => console.log(error));
-  }, []);
+  }, [refreshTrigger]); // Dodany refreshTrigger jako dependency
 
   // Obsługa procesu logowania użytkownika
   const handleLogin = (userData) => {
@@ -64,17 +60,43 @@ const App = () => {
     if (selectedAnswer === correctAnswer) {
       setCorrectAnswers(correctAnswers + 1);
     }
-
     console.log(selectedAnswer);
   };
 
   // Zakończenie quizu i wyświetlenie wyniku
   const handleFinish = () => {
-    alert(`Zdobyłeś ${correctAnswers} punktów.`);
+    alert(`Twój wynik to: ${correctAnswers}`);
+    if (loggedInUser != null) {
+      saveQuizResult(correctAnswers, loggedInUser.id);
+    }
     setCorrectAnswers(0);
     setIsCorrect({});
     setIsSubmitted({});
     setQuestion(Pytanie.map((item) => ({ ...item, selectedAnswer: '' })));
+    setRefreshTrigger(!refreshTrigger);
+  };
+
+  const saveQuizResult = (score, userId) => {
+    const quizResult = {
+      Id_zdajacego: userId,
+      wynik: score
+    };
+
+    fetch("http://localhost:8081/savequizresult", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(quizResult),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Wynik quizu został zapisany w bazie danych:", data);
+        setRefreshTrigger(!refreshTrigger);
+      })
+      .catch((error) => {
+        console.error("Wystąpił błąd podczas zapisywania wyniku quizu:", error);
+      });
   };
 
   return (
@@ -84,13 +106,13 @@ const App = () => {
           <div style={{ position: 'absolute', top: 10, right: 10 }}>
             <h3>Punkty: {correctAnswers}</h3>
           </div>
-          <h3>Witaj {loggedInUser.name} {loggedInUser.surname} {loggedInUser.id}</h3>
-          {Pytanie.map((data, index) => {
-            const backgroundColor = isCorrect[index] === undefined ? 'white' : (isCorrect[index] ? 'lightgreen' : 'lightcoral');
-            return (
-              <div key={index} style={{ backgroundColor }}>
-                <form onSubmit={(e) => handleSubmit(e, index, data.Odpowiedz)}>
-                  <p>Pytanie: {data.Pytanie}</p>
+          <h3>Witaj {loggedInUser.name} {loggedInUser.surname}</h3>
+          <div className="scrollable-container">
+            {Pytanie.map((data, index) => {
+              const backgroundColor = isCorrect[index] === undefined ? 'white' : (isCorrect[index] ? 'lightgreen' : 'lightcoral');
+              return (
+                <form key={index} onSubmit={(e) => handleSubmit(e, index, data.Odpowiedz)} className="quiz-form" style={{ backgroundColor }}>
+                  <p>Pytanie {data.Id}: {data.Pytanie}</p>
                   <label>
                     <input
                       type="radio"
@@ -106,6 +128,7 @@ const App = () => {
                     <input
                       type="radio"
                       className="radio"
+                      
                       value="B"
                       name={`question_${index}`}
                       required
@@ -136,16 +159,17 @@ const App = () => {
                     /> Odpowiedz D: {data.D}
                   </label><br />
                   <button type="submit" disabled={isSubmitted[index]}>Wynik</button>
-                </form><br /><br /><br />
-              </div>
-            );
-          })}
+                </form>
+              );
+            })}
+          </div>
           <button onClick={handleFinish}>Ukończ</button>
           <button onClick={handleLogout}>Wyloguj</button>
+          <UserResults userId={loggedInUser.id} refreshTrigger={refreshTrigger} />
         </div>
       ) : (
         <BrowserRouter>
-           <Routes>
+          <Routes>
             <Route index element={<Main />} />
             <Route path='/loginform' element={<LoginForm onLogin={handleLogin} />} />
             <Route path='/singupform' element={<Singup />} />

@@ -83,6 +83,41 @@ app.post("/register", (req, res) => {
             }
     })
   });
+
+
+
+app.post('/savequizresult', (req, res) => {
+  const { Id_zdajacego, wynik } = req.body;
+
+  if (!Id_zdajacego || !wynik) {
+    return res.status(400).json({ error: 'Brakujące Id_zdajacego lub wynik' });
+  }
+
+  const query = "INSERT INTO wyniki(Id_zdajacego, wynik) VALUES ('?','?')";
+  db.query(query, [Id_zdajacego, wynik], (err, results) => {
+    if (err) {
+      console.error('Błąd zapisu wyniku w bazie danych: ', err);
+      return res.status(500).json({ error: 'Błąd serwera' });
+    }
+
+    res.status(200).json({ message: 'Wynik quizu został zapisany', results });
+  });
+});
+
+app.get('/getuserresults/:userId', (req, res) => {
+  const userId = req.params.userId;
+
+  const query = 'SELECT * FROM wyniki WHERE Id_zdajacego = ?';
+  db.query(query, [userId], (err, results) => {
+    if (err) {
+      console.error('Błąd pobierania wyników z bazy danych: ', err);
+      return res.status(500).json({ error: 'Błąd serwera' });
+    }
+
+    res.status(200).json(results);
+  });
+});
+
   
 app.listen(8081, () => {
     console.log('Nasłuchuję na porcie 8081...');
